@@ -8,6 +8,8 @@ request_count = 0
 def inspect_packages(packet):
     if packet["bytes_sent"] > 1200:
         print(f"🚨 ALERT: High traffic from {packet['device_id']}! ({packet['bytes_sent']} bytes)")
+        with open("security_alerts.log", "a") as file:
+            file.write(f"🚨 ALERT: High traffic from {packet['device_id']}! ({packet['bytes_sent']} bytes)\n")
     else:
         print(f"Device Packet: {packet}")
 
