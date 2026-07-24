@@ -15,6 +15,8 @@ device_map = {
     "smart_light_10": "192.168.1.110"
 }
 
+possible_ports = [80, 443, 22, 23]
+
 request_count = 0
 
 def inspect_packages(packet):
@@ -22,6 +24,11 @@ def inspect_packages(packet):
         print(f"[{packet['timestamp']}] 🚨 ALERT: High traffic from {packet['device_id']}! ({packet['bytes_sent']} bytes)")
         with open("security_alerts.log", "a") as file:
             file.write(f"[{packet['timestamp']}] 🚨 ALERT: High traffic from {packet['device_id']}! ({packet['bytes_sent']} bytes)\n")
+
+    elif packet["target_port"] in [22, 23]:
+        print(f"[{packet['timestamp']}] ⚠️ ALERT: Suspicious port access from {packet['device_id']}! (Port: {packet['target_port']})")
+        with open("security_alerts.log", "a") as file:
+            file.write(f"[{packet['timestamp']}] ⚠️ ALERT: Suspicious port access from {packet['device_id']}! (Port: {packet['target_port']})\n")
     else:
         print(f"Device Packet: {packet}")
 
@@ -30,6 +37,7 @@ while True:
     current_device = random.choice(list(device_map.keys()))
     current_ip = device_map[current_device]
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_port = random.choice(possible_ports)
 
     device_packet = {
     "device_id": current_device,
@@ -37,7 +45,8 @@ while True:
     "ip_address": current_ip,
     "status": "connected",
     "request_count": request_count,
-    "timestamp": current_time
+    "timestamp": current_time,
+    "target_port": current_port
     }
 
     request_count += 1
